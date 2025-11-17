@@ -343,6 +343,28 @@ export const getMonthlyStats = async (req, res) => {
     const { year } = req.query;
     const targetYear = year || new Date().getFullYear();
 
+    
+  // Untuk endpoint GET /api/dashboard/low-stock
+  export const getLowStockProducts = async (req, res) => {
+    try {
+      // Ambil produk yang stoknya di bawah batas (misal 10)
+      // Ini hanya contoh, sesuaikan query Anda
+      const [lowStock] = await pool.query(
+        `SELECT p.produk_id, p.nama_produk, p.sku, s.sistem_total_pcs as total_stock
+         FROM produk p
+         JOIN stok_wh02 s ON p.produk_id = s.produk_id
+         WHERE s.sistem_total_pcs < 10 AND s.sistem_total_pcs > 0 AND s.is_active = 1
+         ORDER BY s.sistem_total_pcs ASC
+         LIMIT 10`
+      );
+      res.json(lowStock);
+  
+    } catch (error) {
+      console.error('Error fetching low stock products:', error.message);
+      res.status(500).json({ msg: 'Server Error', error: error.message });
+    }
+  };
+
     // Stock Opname Progress by Month
     const [opnameStats] = await pool.query(
       `SELECT 
