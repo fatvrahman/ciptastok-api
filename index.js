@@ -54,6 +54,6 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/alerts', alertRoutes);
 
 app.listen(PORT, () => {
-  console.log(`Running in http://localhost:${PORT}`);
+  console.log(`Running in http://localhost:${PORT}`);  // Fix: () bukan ``
   testConnection();
 });
