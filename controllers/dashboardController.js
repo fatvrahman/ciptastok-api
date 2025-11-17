@@ -456,4 +456,4 @@ export const getMonthlyStats = async (req, res) => {
     console.error('Error fetching monthly stats:', error.message);
     res.status(500).json({ msg: 'Server Error', error: error.message });
   }
-};
+}; 
