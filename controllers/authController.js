@@ -1,20 +1,19 @@
-// path: api/controllers/authController.js
-import { pool } from '../config/db.js'; // <-- Tambah .js
+import { pool } from '../config/db.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
-import { logUserActivity } from './userController.js'; // [BARU] Import helper log
+import { logUserActivity } from './userController.js'; // Pastikan file ini ada
 
 // Helper untuk generate token dengan expiry 8 jam
 const generateToken = (userId, roleId) => {
   return jwt.sign(
-    { id: userId, role: roleId }, 
-    process.env.JWT_SECRET || 'rahasia123', 
-    { expiresIn: '8h' } 
+    { id: userId, role: roleId },
+    process.env.JWT_SECRET || 'rahasia123',
+    { expiresIn: '8h' }
   );
 };
 
-// --- [PERBAIKAN] Ganti 'exports.registerUser' menjadi 'export const' ---
+// --- Registrasi User ---
 export const registerUser = async (req, res) => {
   const { nama_lengkap, username, email, password, role_id, divisi_id } = req.body;
 
@@ -58,7 +57,7 @@ export const registerUser = async (req, res) => {
   }
 };
 
-// --- [PERBAIKAN] Ganti 'exports.loginUser' menjadi 'export const' ---
+// --- Login User (FOKUS DI SINI) ---
 export const loginUser = async (req, res) => {
   const { username, password } = req.body;
 
@@ -88,9 +87,11 @@ export const loginUser = async (req, res) => {
 
     const token = generateToken(user.user_id, user.role_id);
 
-    // [BARU] Log aktivitas login
     const ipAddress = req.ip || req.connection.remoteAddress || null;
-    await logUserActivity(user.user_id, 'login', ipAddress);
+    
+    // --- [EKSPERIMEN] NONAKTIFKAN BARIS INI UNTUK SEMENTARA ---
+    // await logUserActivity(user.user_id, 'login', ipAddress);
+    // --- Batas Eksperimen ---
 
     res.json({
       token,
@@ -111,7 +112,7 @@ export const loginUser = async (req, res) => {
   }
 };
 
-// [BARU] Logout user (untuk logging aktivitas)
+// --- Logout User ---
 export const logoutUser = async (req, res) => {
   try {
     const userId = req.user.user_id; // Dari middleware auth
@@ -125,4 +126,3 @@ export const logoutUser = async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
-
