@@ -1,10 +1,9 @@
-// path: api/index.js
-import 'dotenv/config'; // <-- [UBAH] Menggunakan import
-import express from 'express'; // <-- [UBAH]
-import cors from 'cors'; // <-- [UBAH]
-import { testConnection } from './config/db.js'; // <-- [UBAH] dan tambah .js
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import { testConnection } from './config/db.js';
 
-// --- [UBAH] Impor semua rute di atas ---
+// --- Impor semua rute ---
 import authRoutes from './routes/auth.js';
 import productRoutes from './routes/product.js';
 import masterDataRoutes from './routes/masterData.js';
@@ -16,15 +15,36 @@ import alertRoutes from './routes/alert.js';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// --- [PERBAIKAN] Konfigurasi CORS yang Tepat ---
+// Daftar domain yang diizinkan
+const allowedOrigins = [
+  'http://localhost:3000', // Untuk development lokal Anda
+  'https://ciptastok.vercel.app' // Untuk frontend produksi Anda di Vercel
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Izinkan jika origin ada di dalam daftar 'allowedOrigins'
+    // atau jika tidak ada origin (seperti request dari Postman)
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Origin tidak diizinkan oleh CORS'));
+    }
+  },
+  credentials: true // Penting untuk mengizinkan pengiriman cookies/token
+}));
+// --- Batas Perbaikan ---
+
 // Middleware
-app.use(cors());
-app.use(express.json()); 
+// app.use(cors()); // <-- [HAPUS] Baris lama ini sudah diganti di atas
+app.use(express.json());
 
 app.get('/', (req, res) => {
   res.send('Selamat Datang di Ciptastok API!');
 });
 
-// --- [UBAH] Daftarkan rute yang sudah di-impor ---
+// --- Daftarkan rute ---
 app.use('/api/auth', authRoutes);
 app.use('/api/produk', productRoutes);
 app.use('/api/master', masterDataRoutes);
@@ -35,6 +55,5 @@ app.use('/api/alerts', alertRoutes);
 
 app.listen(PORT, () => {
   console.log(`Running in http://localhost:${PORT}`);
-  testConnection(); 
+  testConnection();
 });
-
