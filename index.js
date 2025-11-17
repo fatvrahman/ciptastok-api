@@ -17,11 +17,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Middleware
-app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001','https://ciptastok.vercel.app'],
-  credentials: true,
-  exposedHeaders: 'Content-Disposition',
-}));
+app.use(cors());
 app.use(express.json()); 
 
 app.get('/', (req, res) => {
